@@ -1,0 +1,22 @@
+{
+  "name": "API",
+  "version": "1.0.0",
+  "description": "API to read information over the Inventario Database",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": "0.10.37",
+    "npm": "1.4.28"
+  },
+  "author": "Nahum Fabian Huezo",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "1.14.1",
+    "express": "4.13.3",
+    "express-myconnection": "1.0.4",
+    "mysql": "2.9.0"
+  }
+}
