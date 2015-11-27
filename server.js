@@ -12,6 +12,17 @@ app.use( connection( mysql, config.dbOptions, 'request') );
 
 var apiRoutes   = require('./routes.js');
 
+app.get('/', function(req, res){
+  var html = "GET /api/products<br>\
+              GET /api/clients<br>\
+              GET /api/products/most_sold<br>\
+              GET /api/clients/:name<br>\
+              POST /api/invoice/new<br>\
+              POST /api/authenticate<br>\
+              GET /api/logout";
+
+  res.send(html);
+});
 app.use('/api', apiRoutes);
 
 app.listen(app.get('port'), function(){
