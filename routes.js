@@ -1,12 +1,13 @@
 var express = require('express');
 var router = express.Router();
 var mysql = require('mysql');
+var sqlStmts = require('./SQLStatements');
 
 router.get('/products', function(req, res) {
   req.getConnection(function(err, conn) {
       if (err) return next("Cannot Connect");
 
-      var query = conn.query('SELECT * FROM producto', function(err, rows) {
+      var query = conn.query(sqlStmts.allProductsStmt, function(err, rows) {
           if (err) {
             console.log(err);
             return next("Mysql error, check your query");
