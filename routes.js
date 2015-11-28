@@ -4,15 +4,15 @@ var mysql = require('mysql');
 
 router.get('/products', function(req, res) {
   req.getConnection(function(err, conn) {
-    if (err) return next("Cannot Connect");
+      if (err) return next("Cannot Connect");
 
-    var query = conn.query('SELECT * FROM producto', function(err, rows) {
-      if (err) {
-        console.log(err);
-        return next("Mysql error, check your query");
-      }
-      res.json({ products: rows, products_count: rows.length });
-    });
+      var query = conn.query('SELECT * FROM producto', function(err, rows) {
+          if (err) {
+            console.log(err);
+            return next("Mysql error, check your query");
+          }
+        res.json({ products: rows});
+      });
   });
 });
 
@@ -29,7 +29,9 @@ router.get('/clients', function(req, res) {
         console.log(err);
         return next("Mysql error, check your query");
       }
-      res.json({ clients: rows, clients_count: rows.length });
+      res.json({
+        clients: rows
+      });
     });
   });
 });
