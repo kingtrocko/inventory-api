@@ -82,8 +82,8 @@ function getPreciosNormal(conn, stock, unidades, precios_cliente, cb){
         cb(err);
       }
       var result = {
-        stock,
-        unidades,
+        stock: stock
+        unidades: unidades
         precios_cliente: precios_cliente,
         precios_normal: rows
       };
