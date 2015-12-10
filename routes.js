@@ -71,22 +71,26 @@ router.get('/productstock/:pid', function(req, res) {
   });
 });
 
-router.get('/products/:pid/prices/:typeid', function(req, res){
+router.get('/products/:pid/prices/:price_id', function(req, res){
   req.getConnection(function(err, conn){
     if (err) return next("Cannot Connect");
 
-    var product_id = req.params.pid;
-    var price_id = req.params.typeid;
+    if(req.params.pid && req.params.price_id){
+      var product_id = req.params.pid;
+      var price_id = req.params.typeid;
 
-    var query = conn.query(sqlStmts.precios_por_producto, [product_id, price_id], function(err, rows){
-      if (err) {
-        console.log(err);
-        return next("Mysql error, check your query");
-      }
-      res.json({
-        prices: rows
+      var query = conn.query(sqlStmts.precios_por_producto, [product_id, price_id], function(err, rows){
+        if (err) {
+          console.log(err);
+          return next("Mysql error, check your query");
+        }
+        res.json({
+          prices: rows
+        });
       });
-    });
+    }else{
+      res.json({error_description: "Make sure to provide the following parameters: pid(product_id), price_id within the URL segment."});
+    }
   });
 });
 
