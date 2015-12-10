@@ -76,7 +76,7 @@ router.get('/products/:pid/prices/:price_id', function(req, res){
     if (err) return next("Cannot Connect");
 
     var product_id = req.params.pid;
-    var price_id = req.params.typeid;
+    var price_id = req.params.price_id;
 
     var query = conn.query(sqlStmts.precios_por_producto, [product_id, price_id], function(err, rows){
       if (err) {
