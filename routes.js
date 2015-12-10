@@ -3,93 +3,92 @@ var router = express.Router();
 var mysql = require('mysql');
 var sqlStmts = require('./SQLStatements');
 var async = require('async');
+var util = require('./util.js');
+var url = require('url');
 
 //PARAMS => local_id
 router.get('/products', function(req, res) {
   req.getConnection(function(err, conn) {
     if (err) return next("Cannot Connect");
 
-    var query = conn.query(sqlStmts.products, [1], function(err, rows) {
+    var url_parts = url.parse(req.url, true);
+    var qs = url_parts.query;
+
+    if(qs.local_id){
+      var query = conn.query(sqlStmts.products, [req.params.local_id], function(err, rows) {
+        if (err) {
+          console.log(err);
+          return next("Mysql error, check your query");
+        }
+        res.json({
+          products: rows
+        });
+      });
+    }else{
+      res.json({error_description: "missing local_id parameter"})
+    }
+  });
+});
+
+//PARAMS => producto_id
+//QueryString => client_id, local_id
+router.get('/productstock/:pid', function(req, res) {
+  req.getConnection(function(err, conn) {
+    if (err) return next('Cannot connect');
+
+    var url_parts = url.parse(req.url, true);
+    var qs = url_parts.query;
+
+    if(req.params.pid && qs.client_id && qs.local_id){
+      var params = {
+        product_id: req.params.pid,
+        client_id: qs.client_id,
+        local_id: qs.local_id
+      };
+
+      async.waterfall([
+        function(callback) {
+          util.getStock(params, conn, callback);
+        },
+        function(stock, callback){
+          util.getUnidades(params, conn, stock, callback);
+        },
+        function(stock, unidades, callback){
+          util.getPreciosCliente(params, conn, stock, unidades, callback);
+        },
+        function(stock, unidades, precios_cliente, callback){
+          util.getPreciosNormal(conn, stock, unidades, precios_cliente, callback);
+        }
+      ], function (err, result) {
+        if(err){
+          res.json({ error_description: "internal error while executing the sql query."});
+        }
+        res.json(result);
+      });
+    }else{
+      res.json({error_description: "Make sure you provided all the following parameters: pid, client_id, local_id"});
+    }
+  });
+});
+
+router.get('/products/:pid/prices/:typeid', function(req, res){
+  req.getConnection(function(err, conn){
+    if (err) return next("Cannot Connect");
+
+    var product_id = req.params.pid;
+    var price_id = req.params.typeid;
+
+    var query = conn.query(sqlStmts.precios_por_producto, [product_id, price_id], function(err, rows){
       if (err) {
         console.log(err);
         return next("Mysql error, check your query");
       }
       res.json({
-        products: rows
+        prices: rows
       });
     });
   });
 });
-
-//PARAMS => producto_id, cliente_id, local_id
-router.get('/product-stock', function(req, res) {
-  req.getConnection(function(err, conn) {
-    if (err) return next('Cannot connect');
-
-    async.waterfall([
-      function(callback) {
-        getStock(conn, callback);
-      },
-      function(stock, callback){
-        getUnidades(conn, stock, callback);
-      },
-      function(stock, unidades, callback){
-        getPreciosCliente(conn, stock, unidades, callback);
-      },
-      function(stock, unidades, precios_cliente, callback){
-        getPreciosNormal(conn, stock, unidades, precios_cliente, callback);
-      }
-    ], function (err, result) {
-      if(err){
-        res.json({error: true, error_description: "internal error while executing the sql query."});
-      }
-      res.json(result);
-    });
-  });
-});
-
-function getStock(conn, cb) {
-  var q = conn.query(sqlStmts.product_stock, [1, 1], function(err, rows) {
-    if (err) {
-      cb(err)
-    }
-    cb(null, rows);
-  });
-}
-
-function getUnidades(conn, stock, cb){
-  var q = conn.query(sqlStmts.unidades, [1], function(err, rows) {
-    if (err) {
-      cb(err)
-    }
-    cb(null, stock, rows);
-  });
-}
-
-function getPreciosCliente(conn, stock, unidades, cb){
-  var q = conn.query(sqlStmts.precios_cliente, [1], function(err, rows){
-    if(err){
-      cb(err)
-    }
-    cb(null, stock, unidades, rows);
-
-  });
-}
-
-function getPreciosNormal(conn, stock, unidades, precios_cliente, cb){
-    var q = conn.query(sqlStmts.precios_normal, function(err, rows){
-      if(err){
-        cb(err);
-      }
-      var result = {
-        stock: stock,
-        unidades: unidades,
-        precios_cliente: precios_cliente,
-        precios_normal: rows
-      };
-      cb(null, result);
-    });
-}
 
 router.get('/products/most_sold', function(req, res) {
 

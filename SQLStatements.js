@@ -47,5 +47,20 @@ module.exports = {
                       join pais p\
                       	on p.id_pais = e.pais_id\
                       where cli.id_cliente = ?",
-  precios_normal: "select *  from precios p where p.estatus_precio = 1"
+  precios_normal: "select *  from precios p where p.estatus_precio = 1",
+
+  precios_por_producto: "select *\
+                        	from unidades_has_precio uhprecio\
+                        join producto p\
+                        	on uhprecio.id_producto = p.producto_id\
+                        left join impuestos i\
+                        	on i.id_impuesto = p.producto_impuesto\
+                        join precios\
+                        	on uhprecio.id_precio = precios.id_precio\
+                        join unidades u\
+                        	on u.id_unidad = uhprecio.id_unidad\
+                        join unidades_has_producto uhproducto\
+                        	on uhprecio.id_unidad = uhproducto.id_unidad and uhprecio.id_producto = uhproducto.producto_id\
+                        where uhprecio.id_precio = ? and uhprecio.id_producto = ?\
+                        order by uhproducto.orden asc"
 };
