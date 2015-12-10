@@ -31,7 +31,7 @@ router.get('/products', function(req, res) {
 });
 
 //PARAMS => producto_id
-//QueryString => client_id, local_id
+//QueryString params=> client_id, local_id
 router.get('/productstock/:pid', function(req, res) {
   req.getConnection(function(err, conn) {
     if (err) return next('Cannot connect');
@@ -39,7 +39,7 @@ router.get('/productstock/:pid', function(req, res) {
     var url_parts = url.parse(req.url, true);
     var qs = url_parts.query;
 
-    if(req.params.pid && qs.client_id && qs.local_id){
+    if(qs.client_id && qs.local_id){
       var params = {
         product_id: req.params.pid,
         client_id: qs.client_id,
@@ -66,7 +66,7 @@ router.get('/productstock/:pid', function(req, res) {
         res.json(result);
       });
     }else{
-      res.json({error_description: "Make sure you provided all the following parameters: pid, client_id, local_id"});
+      res.json({error_description: "Make sure you provided all the following parameters: client_id, local_id"});
     }
   });
 });
@@ -75,22 +75,18 @@ router.get('/products/:pid/prices/:price_id', function(req, res){
   req.getConnection(function(err, conn){
     if (err) return next("Cannot Connect");
 
-    if(req.params.pid && req.params.price_id){
-      var product_id = req.params.pid;
-      var price_id = req.params.typeid;
+    var product_id = req.params.pid;
+    var price_id = req.params.typeid;
 
-      var query = conn.query(sqlStmts.precios_por_producto, [product_id, price_id], function(err, rows){
-        if (err) {
-          console.log(err);
-          return next("Mysql error, check your query");
-        }
-        res.json({
-          prices: rows
-        });
+    var query = conn.query(sqlStmts.precios_por_producto, [product_id, price_id], function(err, rows){
+      if (err) {
+        console.log(err);
+        return next("Mysql error, check your query");
+      }
+      res.json({
+        prices: rows
       });
-    }else{
-      res.json({error_description: "Make sure to provide the following parameters: pid(product_id), price_id within the URL segment."});
-    }
+    });
   });
 });
 
