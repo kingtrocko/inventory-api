@@ -34,8 +34,8 @@ module.exports = {
     });
   },
 
-  getPreciosNormal: function (conn, stock, unidades, precios_cliente, cb){
-      var q = conn.query(sqlStmts.precios_normal, function(err, rows){
+  getPricesTypes: function (conn, stock, unidades, precios_cliente, cb){
+      var q = conn.query(sqlStmts.prices_types, function(err, rows){
         if(err){
           cb(err);
         }

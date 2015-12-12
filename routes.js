@@ -57,7 +57,7 @@ router.get('/productstock/:pid', function(req, res) {
           util.getPreciosCliente(params, conn, stock, unidades, callback);
         },
         function(stock, unidades, precios_cliente, callback){
-          util.getPreciosNormal(conn, stock, unidades, precios_cliente, callback);
+          util.getPricesTypes(conn, stock, unidades, precios_cliente, callback);
         }
       ], function (err, result) {
         if(err){
@@ -87,6 +87,22 @@ router.get('/products/:pid/prices/:price_id', function(req, res){
         prices: rows
       });
     });
+  });
+});
+
+router.get('/prices/types', function(req, res){
+  req.getConnection(function(err, conn){
+      if (err) return next("Cannot Connect");
+
+      var query = conn.query(sqlStmts.prices_types, function(err, rows){
+        if (err) {
+          console.log(err);
+          return next("Mysql error, check your query");
+        }
+        res.json({
+          prices_types: rows
+        });
+      });
   });
 });
 
