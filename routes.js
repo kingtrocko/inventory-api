@@ -78,7 +78,11 @@ router.get('/products/:pid/prices/:price_id', function(req, res){
     var product_id = req.params.pid;
     var price_id = req.params.price_id;
 
-    var query = conn.query(sqlStmts.precios_por_producto, [product_id, price_id], function(err, rows){
+    var sql = sqlStmts.precios_por_producto;
+    var values = [price_id, product_id];
+    sql = mysql.format(sql, values);
+    
+    var query = conn.query(sql, function(err, rows){
       if (err) {
         console.log(err);
         return next("Mysql error, check your query");

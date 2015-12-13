@@ -63,6 +63,5 @@ module.exports = {
                         	on u.id_unidad = uhprecio.id_unidad\
                         join unidades_has_producto uhproducto\
                         	on uhprecio.id_unidad = uhproducto.id_unidad and uhprecio.id_producto = uhproducto.producto_id\
-                        where uhprecio.id_precio = ? and uhprecio.id_producto = ?\
-                        order by uhproducto.orden asc"
+                        where uhprecio.id_precio = ? and uhprecio.id_producto = ? order by uhproducto.orden asc"
 };
